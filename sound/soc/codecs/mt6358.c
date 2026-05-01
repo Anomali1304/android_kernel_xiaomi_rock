@@ -318,26 +318,6 @@ int mt6358_set_mtkaif_calibration_phase(struct snd_soc_component *cmpnt,
 }
 EXPORT_SYMBOL_GPL(mt6358_set_mtkaif_calibration_phase);
 
-/* dc trim */
-static int mt6358_get_hpofs_auxadc(struct mt6358_priv *priv)
-{
-	int value = 0;
-#if !IS_ENABLED(CONFIG_FPGA_EARLY_PORTING) && !defined(SKIP_SB)
-	int ret;
-	struct iio_channel *auxadc = priv->hpofs_cal_auxadc;
-
-	if (!IS_ERR(auxadc)) {
-		ret = iio_read_channel_raw(auxadc, &value);
-		if (ret < 0) {
-			dev_err(priv->dev, "Error: %s read fail (%d)\n",
-				__func__, ret);
-			return ret;
-		}
-	}
-#endif /* #if !IS_ENABLED(CONFIG_FPGA_EARLY_PORTING) */
-	return value;
-}
-
 /* dl pga gain */
 static const char *const dl_pga_gain[] = {
 	"8Db", "7Db", "6Db", "5Db", "4Db",
@@ -4833,6 +4813,25 @@ static void stop_trim_hardware_with_lo(struct mt6358_priv *priv)
 
 	/* Reset playback gpio (mosi/clk/sync) */
 	playback_gpio_reset(priv);
+}
+
+static int mt6358_get_hpofs_auxadc(struct mt6358_priv *priv)
+{
+	int value = 0;
+#if !IS_ENABLED(CONFIG_FPGA_EARLY_PORTING)
+	int ret;
+	struct iio_channel *auxadc = priv->hpofs_cal_auxadc;
+
+	if (!IS_ERR(auxadc)) {
+		ret = iio_read_channel_raw(auxadc, &value);
+		if (ret < 0) {
+			dev_err(priv->dev, "Error: %s read fail (%d)\n",
+				__func__, ret);
+			return ret;
+		}
+	}
+#endif /* #if !IS_ENABLED(CONFIG_FPGA_EARLY_PORTING) */
+	return value;
 }
 
 static void hp_trim_offset(struct mt6358_priv *priv)

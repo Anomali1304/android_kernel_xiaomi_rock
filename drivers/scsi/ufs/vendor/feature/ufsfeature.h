@@ -51,13 +51,10 @@
 #define UFS_UPIU_MAX_GENERAL_LUN		8
 #define UFSHCD_STATE_OPERATIONAL		2	/* ufshcd.c */
 
-/* UFSHCD error handling flags */
-enum {
-	UFSHCD_EH_IN_PROGRESS = (1 << 0),		/* ufshcd.c */
-};
+#ifndef ufshcd_eh_in_progress
 #define ufshcd_eh_in_progress(h) \
-	((h)->eh_flags & UFSHCD_EH_IN_PROGRESS)		/* ufshcd.c */
-
+	((h)->eh_flags & (1 << 0))		/* ufshcd.c */
+#endif
 
 #define UFSFEATURE_QUERY_OPCODE			0x5500
 

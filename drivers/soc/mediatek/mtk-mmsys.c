@@ -5,8 +5,8 @@
  */
 
 #include <linux/device.h>
-#include <linux/module.h>
 #include <linux/io.h>
+#include <linux/module.h>
 #include <linux/of_device.h>
 #include <linux/platform_device.h>
 #include <linux/soc/mediatek/mtk-mmsys.h>

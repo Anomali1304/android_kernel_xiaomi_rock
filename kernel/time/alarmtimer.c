@@ -35,12 +35,6 @@
 
 #undef CREATE_TRACE_POINTS
 #include <trace/hooks/wakeupbypass.h>
-
-#if IS_ENABLED(CONFIG_MTK_IRQ_MONITOR_DEBUG)
-#include <linux/sched/clock.h>
-#endif
-
-
 /**
  * struct alarm_base - Alarm timer bases
  * @lock:		Lock for syncrhonized access to the base
@@ -294,9 +288,6 @@ static int alarmtimer_suspend(struct device *dev)
 	unsigned long flags;
 	struct rtc_time tm;
 	int wakeup_bypass_enabled = 0;
-#ifdef CONFIG_ALARMTIMER_DEBUG
-	struct rtc_time time;
-#endif
 
 	spin_lock_irqsave(&freezer_delta_lock, flags);
 	min = freezer_delta;

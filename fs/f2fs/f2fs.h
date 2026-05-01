@@ -627,11 +627,7 @@ struct extent_info {
 			unsigned long long last_blocks;
 		};
 	};
-#if IS_ENABLED(CONFIG_ARM)
-} __packed;
-#else
 };
-#endif
 
 struct extent_node {
 	struct rb_node rb_node;		/* rb node located in rb-tree */
