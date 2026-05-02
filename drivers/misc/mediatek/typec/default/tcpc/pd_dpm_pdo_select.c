@@ -72,7 +72,6 @@ void dpm_extract_pdo_info(
 }
 
 #ifndef MIN
-#define MIN(a, b)	((a < b) ? (a) : (b))
 #endif
 
 static inline int dpm_calc_src_cap_power_uw(

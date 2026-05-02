@@ -88,8 +88,6 @@
 #define DEFAULT_GCC_DEQ_BOUND_THRS 20
 #define DEFAULT_GCC_DEQ_BOUND_QUOTA 6
 
-#define MAX(a, b) (((a) > (b)) ? (a) : (b))
-#define MIN(a, b) (((a) < (b)) ? (a) : (b))
 
 #define SEQ_printf(m, x...)\
 do {\
