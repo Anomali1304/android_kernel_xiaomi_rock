@@ -120,8 +120,8 @@ struct mtk_share_obj {
 	u8 share_buf[SCP_SHARE_BUFFER_SIZE];
 };
 
-void scp_memcpy_aligned(void __iomem *dst, const void *src, unsigned int len);
-void scp_ipi_lock(struct mtk_scp *scp, u32 id);
-void scp_ipi_unlock(struct mtk_scp *scp, u32 id);
+void mtk_scp_memcpy_aligned(void __iomem *dst, const void *src, unsigned int len);
+void mtk_scp_ipi_lock(struct mtk_scp *scp, u32 id);
+void mtk_scp_ipi_unlock(struct mtk_scp *scp, u32 id);
 
 #endif

@@ -57,7 +57,7 @@ static int imgsys_send(struct platform_device *pdev, enum hcp_id id,
 {
 	int ret;
 #if MTK_CM4_SUPPORT
-	ret = scp_ipi_send(imgsys_dev->scp_pdev, SCP_IPI_DIP, &ipi_param,
+	ret = mtk_rproc_scp_ipi_send(imgsys_dev->scp_pdev, SCP_IPI_DIP, &ipi_param,
 			   sizeof(ipi_param), 0);
 #else
 	if (wait)

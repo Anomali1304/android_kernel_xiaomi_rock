@@ -15,6 +15,7 @@
 #include <linux/platform_device.h>
 #include <linux/remoteproc.h>
 #include <linux/remoteproc/mtk_scp.h>
+#include <linux/rpmsg.h>
 #include <linux/rpmsg/mtk_rpmsg.h>
 
 #include "mtk_common.h"
@@ -103,17 +104,17 @@ static void scp_ipi_handler(struct mtk_scp *scp)
 		return;
 	}
 
-	scp_ipi_lock(scp, id);
+	mtk_scp_ipi_lock(scp, id);
 	handler = ipi_desc[id].handler;
 	if (!handler) {
 		dev_err(scp->dev, "No such ipi id = %d\n", id);
-		scp_ipi_unlock(scp, id);
+		mtk_scp_ipi_unlock(scp, id);
 		return;
 	}
 
 	memcpy_fromio(tmp_data, &rcv_obj->share_buf, len);
 	handler(tmp_data, len, ipi_desc[id].priv);
-	scp_ipi_unlock(scp, id);
+	mtk_scp_ipi_unlock(scp, id);
 
 	scp->ipi_id_ack[id] = true;
 	wake_up(&scp->ack_wq);
@@ -266,8 +267,8 @@ static int scp_elf_load_segments(struct rproc *rproc, const struct firmware *fw)
 
 		/* put the segment where the remote processor expects it */
 		if (phdr->p_filesz)
-			scp_memcpy_aligned(ptr, elf_data + phdr->p_offset,
-					   filesz);
+			mtk_scp_memcpy_aligned(ptr, elf_data + phdr->p_offset,
+					       filesz);
 	}
 
 	return ret;
@@ -582,14 +583,14 @@ static int scp_register_ipi(struct platform_device *pdev, u32 id,
 {
 	struct mtk_scp *scp = platform_get_drvdata(pdev);
 
-	return scp_ipi_register(scp, id, handler, priv);
+	return mtk_scp_ipi_register(scp, id, handler, priv);
 }
 
 static void scp_unregister_ipi(struct platform_device *pdev, u32 id)
 {
 	struct mtk_scp *scp = platform_get_drvdata(pdev);
 
-	scp_ipi_unregister(scp, id);
+	mtk_scp_ipi_unregister(scp, id);
 }
 
 static int scp_send_ipi(struct platform_device *pdev, u32 id, void *buf,
@@ -597,7 +598,7 @@ static int scp_send_ipi(struct platform_device *pdev, u32 id, void *buf,
 {
 	struct mtk_scp *scp = platform_get_drvdata(pdev);
 
-	return scp_ipi_send(scp, id, buf, len, wait);
+	return mtk_rproc_scp_ipi_send(scp, id, buf, len, wait);
 }
 
 static struct mtk_rpmsg_info mtk_scp_rpmsg_info = {
@@ -697,7 +698,7 @@ static int scp_probe(struct platform_device *pdev)
 	}
 
 	/* register SCP initialization IPI */
-	ret = scp_ipi_register(scp, SCP_IPI_INIT, scp_init_ipi_handler, scp);
+	ret = mtk_scp_ipi_register(scp, SCP_IPI_INIT, scp_init_ipi_handler, scp);
 	if (ret) {
 		dev_err(dev, "Failed to register IPI_SCP_INIT\n");
 		goto release_dev_mem;
@@ -725,7 +726,7 @@ static int scp_probe(struct platform_device *pdev)
 
 remove_subdev:
 	scp_remove_rpmsg_subdev(scp);
-	scp_ipi_unregister(scp, SCP_IPI_INIT);
+	mtk_scp_ipi_unregister(scp, SCP_IPI_INIT);
 release_dev_mem:
 	scp_unmap_memory_region(scp);
 destroy_mutex:
@@ -745,7 +746,7 @@ static int scp_remove(struct platform_device *pdev)
 
 	rproc_del(scp->rproc);
 	scp_remove_rpmsg_subdev(scp);
-	scp_ipi_unregister(scp, SCP_IPI_INIT);
+	mtk_scp_ipi_unregister(scp, SCP_IPI_INIT);
 	scp_unmap_memory_region(scp);
 	for (i = 0; i < SCP_IPI_MAX; i++)
 		mutex_destroy(&scp->ipi_desc[i].lock);

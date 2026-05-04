@@ -3,11 +3,17 @@
  * Copyright 2019 Google LLC.
  */
 
-#ifndef __LINUX_RPMSG_MTK_RPMSG_H
-#define __LINUX_RPMSG_MTK_RPMSG_H
+#ifndef __LINUX_RPMSG_MTK_RPMSG_H_V2
+#define __LINUX_RPMSG_MTK_RPMSG_H_V2
 
+#include <linux/rpmsg.h>
 #include <linux/platform_device.h>
 #include <linux/remoteproc.h>
+#include <linux/list.h>
+#include <linux/spinlock.h>
+
+struct mtk_rpmsg_rproc_subdev;
+struct mtk_mbox_device;
 
 typedef void (*ipi_handler_t)(void *data, unsigned int len, void *priv);
 
@@ -37,8 +43,8 @@ void mtk_rpmsg_destroy_rproc_subdev(struct rproc_subdev *subdev);
 
 struct mtk_rpmsg_channel_info {
 	struct rpmsg_channel_info info;
-	//bool registered;
-	//struct list_head list;
+	bool registered;
+	struct list_head list;
 	unsigned int send_slot; //send slot offset
 	unsigned int recv_slot; //recv slot offset
 	unsigned int send_slot_size; // send slot count
@@ -53,7 +59,7 @@ struct mtk_rpmsg_channel_info {
 
 struct mtk_rpmsg_endpoint {
 	struct rpmsg_endpoint ept;
-	//struct mtk_rpmsg_rproc_subdev *mtk_subdev;
+	struct mtk_rpmsg_rproc_subdev *mtk_subdev;
 	struct mtk_rpmsg_device *mdev;
 	struct mtk_rpmsg_channel_info *mchan;
 };
@@ -66,7 +72,7 @@ struct mtk_rpmsg_operations {
 
 struct mtk_rpmsg_device {
 	struct rpmsg_device rpdev;
-	//struct mtk_rpmsg_rproc_subdev *mtk_subdev;
+	struct mtk_rpmsg_rproc_subdev *mtk_subdev;
 	struct platform_device *pdev;
 	struct mtk_rpmsg_operations *ops;
 	struct mtk_mbox_device *mbdev;
